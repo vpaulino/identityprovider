@@ -2,6 +2,69 @@
 
 A minimal Identity Provider built in ASP.NET Core to explore and understand OAuth2 and OpenID Connect flows, including Authorization Code and On-Behalf-Of. This project simulates how real IdPs work, focusing on protocol mechanics, token generation, scopes, audiences, and secure delegation. Ideal for hands-on learning and experimentation.
 
+# 🛡️ Minimal Identity Provider in ASP.NET Core — A Learning Journey into OAuth2 and OpenID Connect
+
+This project is a **hands-on exploration of the OAuth2 and OpenID Connect protocols**, built entirely in **ASP.NET Core**. It simulates a **minimal Identity Provider (IdP)** that supports two of the most fundamental authorization flows:
+
+- ✅ **Authorization Code Flow** (for authenticating end users)
+- 🔄 **On-Behalf-Of Flow (OBO)** (for service-to-service delegation using a user's access token)
+
+---
+
+## 📚 Why This Project?
+
+The goal of this implementation is not to provide production-grade security infrastructure — but instead to **demystify** what happens **under the hood** when applications integrate with real-world identity providers like **Azure Entra ID**, **Auth0**, or **IdentityServer**.
+
+It answers questions like:
+
+- 🔐 What does it mean to be an OAuth2-compliant Identity Provider?
+- 🧭 What endpoints are required to support OpenID Connect?
+- 🎟️ How are tokens issued, validated, and used between apps?
+- 🧾 How are scopes, audiences, roles, and claims negotiated?
+- 👥 How do multi-tier architectures work with OBO (e.g., Website → BFF → Backend)?
+
+---
+
+## 🧰 Features Implemented
+
+- `/.well-known/openid-configuration` for dynamic discovery
+- `/.well-known/jwks.json` to expose signing keys for token validation
+- `/authorize` to issue authorization codes
+- `/token` to support:
+  - `authorization_code` flow
+  - `urn:ietf:params:oauth:grant-type:jwt-bearer` (OBO)
+- 🔐 Cookie-based login simulation (no external user DB)
+- 🧑‍🤝‍🧑 In-memory user, client, role, and scope registration
+- 🎯 Support for registering audiences and scopes
+- 🔒 Issued `access_token` and `id_token` with claims, roles, and scope handling
+
+---
+
+## 💡 Who Is This For?
+
+- Developers who want to **understand how OAuth/OIDC actually works**
+- Architects planning to build secure systems with **multi-tier authorization**
+- Anyone who's ever configured a cloud identity provider and thought:
+  > "Wait... what do all these fields *actually* do?"
+
+---
+
+## 🚀 How to Run It
+
+The solution includes:
+
+- 🧩 Identity Provider (IdP) Server
+- 🌐 Razor MVC Client App
+- 🔁 BFF-style Web API
+- 📦 Backend API to demonstrate chained OBO flow
+- 🧪 `.http` files to simulate registration, authentication, and token requests
+
+---
+
+Feel free to fork, explore, and extend — the whole point of this project is **learning by building**. Contributions and improvements welcome!
+
+
+
 # OAuth 2.0 / OIDC Architecture with On-Behalf-Of Flow
 
 This solution implements a multi-layer architecture using OAuth 2.0 and OpenID Connect (OIDC). It includes:
