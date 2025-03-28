@@ -88,7 +88,7 @@ This solution implements a multi-layer architecture using OAuth 2.0 and OpenID C
 ### 📡 2. Website calls the **BFF API**
 
 - The website uses the `access_token` in the `Authorization: Bearer` header.
-- The token’s `aud` (audience) must be set to the BFF API's client ID (`mybffapi-clientid`).
+- The token’s `aud` (audience) must be set to the BFF API's client ID (`bffapi-clientid`).
 - The BFF validates the token against the configured audience.
 
 ### 🔄 3. BFF calls the **Backend API** using OBO
@@ -98,13 +98,13 @@ This solution implements a multi-layer architecture using OAuth 2.0 and OpenID C
   - `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer`
   - `assertion=<user's original access_token>`
   - `requested_token_use=on_behalf_of`
-  - `audience=mybackendapi-clientid`
+  - `audience=backendapi-clientid`
 - The IDP validates the incoming token and issues a new access token for the backend API.
 
 ### 🛠️ 4. Backend API processes the request
 
 - The Backend API receives the new access token with:
-  - `aud = mybackendapi-clientid`
+  - `aud = backendapi-clientid`
   - `sub = original user id`
   - Optional roles or scopes based on user-client-role associations
 
@@ -117,8 +117,8 @@ You must register three clients:
 | Client ID             | Description                     | Role            |
 |-----------------------|----------------------------------|-----------------|
 | `mywebsite-clientid`  | Razor website                   | Public OAuth client (OIDC login) |
-| `mybffapi-clientid`   | Web API acting as BFF           | Confidential client & resource |
-| `mybackendapi-clientid` | Downstream API                | Resource server only |
+| `bffapi-clientid`   | Web API acting as BFF           | Confidential client & resource |
+| `backendapi-clientid` | Downstream API                | Resource server only |
 
 ---
 
@@ -126,8 +126,8 @@ You must register three clients:
 
 | Token Used For        | Target Audience (`aud`)         |
 |-----------------------|----------------------------------|
-| Calling BFF from Website | `mybffapi-clientid`           |
-| Calling Backend API from BFF (OBO) | `mybackendapi-clientid` |
+| Calling BFF from Website | `bffapi-clientid`           |
+| Calling Backend API from BFF (OBO) | `backendapi-clientid` |
 
 Tokens must always have the correct `aud` for the service they are intended for.
 
@@ -188,7 +188,7 @@ grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer
 client_id=mywebsite-clientid
 requested_token_use=on_behalf_of
 assertion=<original_access_token>
-audience=mybffapi-clientid
+audience=bffapi-clientid
 
 
 # 🧩 Identity Provider: Audience-Specific Access Tokens via Scopes
@@ -265,10 +265,10 @@ scope=openid profile email bff.read
 The token generation pipeline:
 
 1. **Validates** that the requesting client is allowed to ask for `bff.read`
-2. **Resolves** the scope `bff.read` to audience `mybffapi-clientid`
+2. **Resolves** the scope `bff.read` to audience `bffapi-clientid`
 3. **Queries** the `UserClientRole` repository to find roles the user has in that API
 4. **Generates** the access token with:
-   - `"aud": "mybffapi-clientid"`
+   - `"aud": "bffapi-clientid"`
    - `"scope": "bff.read"`
    - `"roles": [...]` (based on the user-role mapping)
    - `"sub"`, `"iat"`, `"exp"`, etc.
@@ -293,7 +293,7 @@ This access token can now be safely presented to the BFF API and validated using
 
 The website can now:
 - Request access tokens with `scope=bff.read`
-- Receive a token scoped to the BFF API (`aud=mybffapi-clientid`)
+- Receive a token scoped to the BFF API (`aud=bffapi-clientid`)
 - Include role-based claims usable by the BFF
 - Enable BFF to use the token or further exchange it for downstream access via OBO
 
