@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+var authSettings = builder.Configuration.GetSection("Authentication");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "Cookies";
@@ -13,8 +15,8 @@ builder.Services.AddAuthentication(options =>
 .AddCookie("Cookies")
 .AddOpenIdConnect("oidc", options =>
 {
-    options.Authority = "https://localhost:56519";
-    options.ClientId = "website-clientid";
+    options.Authority = authSettings["Authority"];
+    options.ClientId = authSettings["ClientId"];
     options.ResponseType = "code";
     options.SaveTokens = true;
     options.RequireHttpsMetadata = false;

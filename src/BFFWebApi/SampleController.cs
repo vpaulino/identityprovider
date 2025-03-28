@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -17,11 +18,17 @@ public class SecureController : ControllerBase
 
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration config;
+    private readonly string _backendApiUrl;
+    private readonly string authorityUrl;
 
-    public SecureController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
+    public SecureController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor, IConfiguration config)
     {
         _httpClientFactory = httpClientFactory;
         _httpContextAccessor = httpContextAccessor;
+        this.config = config;
+        _backendApiUrl = config["Services:BackendApi"];
+        authorityUrl = config["Authorization:Authority"];
     }
 
     [Authorize]
@@ -58,7 +65,7 @@ public class SecureController : ControllerBase
         };
 
         var tokenClient = _httpClientFactory.CreateClient();
-        var tokenResponse = await tokenClient.PostAsync("https://localhost:56519/token", new FormUrlEncodedContent(form));
+        var tokenResponse = await tokenClient.PostAsync($"{authorityUrl}/token", new FormUrlEncodedContent(form));
         if (!tokenResponse.IsSuccessStatusCode)
             return $"❌ Token request failed: {tokenResponse.StatusCode}";
 
@@ -69,7 +76,7 @@ public class SecureController : ControllerBase
         var backendClient = _httpClientFactory.CreateClient();
         backendClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", newToken);
 
-        var backendResponse = await backendClient.GetAsync("https://localhost:8080/api/Secure");
+        var backendResponse = await backendClient.GetAsync($"{_backendApiUrl}/api/Secure");
         var content = await backendResponse.Content.ReadAsStringAsync();
 
         return $"✅ Backend API response:\n{content}";

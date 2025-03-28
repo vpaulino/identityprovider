@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+
+  identityprovider:
+    build:
+      context: .
+      dockerfile: src/IdentityProviderApi/Dockerfile
+    ports:
+      - "56520:56520"
+    environment:
+      - ASPNETCORE_URLS=http://+:56520
+    container_name: identity-provider
+
+  website:
+    build:
+      context: .
+      dockerfile: src/WebSiteClient/Dockerfile
+    ports:
+      - "55265:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - Authentication__Authority=http://identityprovider:56520
+      - Authentication__ClientId=website-clientid
+      - Services__BffApi=http://bffapi:8080
+    depends_on:
+      - identityprovider
+      - bffapi
+    container_name: website-app
+
+  bffapi:
+    build:
+      context: .
+      dockerfile: src/BFFWebApi/Dockerfile
+    ports:
+      - "56511:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - Authorization__Authority=http://identityprovider:56520
+      - Authorization__Audience=bffapi-clientid
+      - Services__BackendApi=http://backendapi:6060
+    depends_on:
+      - identityprovider
+      - backendapi
+    container_name: bff-api
+
+  backendapi:
+    build:
+      context: .
+      dockerfile: src/BackendWebApi/Dockerfile
+    ports:
+      - "6000:6060"
+    environment:
+      - ASPNETCORE_URLS=http://+:6060
+      - Authorization__Authority=http://identityprovider:56520
+      - Authorization__Audience=backendapi-clientid
+    depends_on:
+      - identityprovider
+    container_name: backend-api

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace OidcClientApp.Controllers
 {
@@ -11,10 +12,12 @@ namespace OidcClientApp.Controllers
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string _bffApiUrl;
 
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _bffApiUrl = configuration["Services:BffApi"];
         }
 
         public IActionResult Index() => View();
@@ -31,7 +34,7 @@ namespace OidcClientApp.Controllers
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await client.GetAsync("https://localhost:56511/api/secure");
+            var response = await client.GetAsync($"{_bffApiUrl}/api/secure");
             var content = await response.Content.ReadAsStringAsync();
 
             ViewData["ApiResponse"] = content;
