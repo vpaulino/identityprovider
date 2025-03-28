@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Home Page";
+    var apiResult = ViewData["ApiResponse"]?.ToString();
+}
+@Html.AntiForgeryToken()
+
+<h1>Welcome to the OIDC Client App</h1>
+
+@if (User.Identity?.IsAuthenticated ?? false)
+{
+    <p>You are logged in as <strong>@User.Identity.Name</strong></p>
+
+    <form method="post" action="/Home/CallApi">
+        <button type="submit" class="btn btn-primary">Call Protected API</button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(apiResult))
+    {
+        <h3>API Response:</h3>
+        <pre>@apiResult</pre>
+    }
+}
+else
+{
+    <p>You are not logged in.</p>
+}

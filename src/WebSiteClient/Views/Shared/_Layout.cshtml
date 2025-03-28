@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>OIDC Client</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <span>Hello, @User.Identity.Name</span>
+                <form method="post" action="/signout">
+                    <button type="submit">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a href="/signin">Login</a>
+            }
+        </nav>
+    </header>
+    <main role="main" class="container">
+        @RenderBody()
+    </main>
+</body>
+</html>

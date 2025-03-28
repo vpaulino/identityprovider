@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Secure Page";
+}
+<h1>Secure Page</h1>
+<p>This page is only visible when authenticated.</p>
+<pre>
+@foreach (var claim in User.Claims)
+{
+    <div>@claim.Type: @claim.Value</div>
+}
+</pre>

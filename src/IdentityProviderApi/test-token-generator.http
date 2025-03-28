@@ -1,0 +1,129 @@
+﻿### Create a new user
+POST http://localhost:56520/users
+content-Type: application/json
+
+{
+  "subjectId": "user3",
+  "name": "Alice Doe",
+  "email": "alice@example.com"
+}
+
+### List all users
+GET http://localhost:56520/users
+
+### Register a new client The Website (website-clientid) must be allowed to request bff.read:
+POST http://localhost:56520/clients
+Content-Type: application/json
+
+{
+  "clientId": "website-clientid",
+  "name": "My Website Test App",
+  "redirectUri": "https://localhost:55265/signin-oidc",
+  "allowedScopes": ["openid","email","profile","bff.read"]
+}
+
+
+
+### Register BFF a new client
+POST http://localhost:56520/clients
+Content-Type: application/json
+
+{
+  "clientId": "bffapi-clientid",
+  "name": "My Backend For Frontend Test Api",
+  "allowedScopes": ["openid","email","profile","backend.read"]
+}
+
+### Register backend api 
+POST http://localhost:56520/clients
+Content-Type: application/json
+
+{
+  "clientId": "backendapi-clientid",
+  "name": "My Backend Api"
+
+}
+
+### Scopes . whoever gothe the scope identified by the name, is able to use an access token to reach the audience.
+
+### Scope for Website → BFF
+POST http://localhost:56520/scopes
+Content-Type: application/json
+
+{
+  "name": "bff.read",
+  "audience": "bffapi-clientid",
+  "description": "Allows reading BFF data"
+}
+
+### Scope for BFF → Backend
+POST http://localhost:56520/scopes
+Content-Type: application/json
+
+{
+  "name": "backend.read",
+  "audience": "backendapi-clientid",
+  "description": "Allows reading BFF data"
+}
+
+
+### Associate a user with a role in a client
+POST http://localhost:56520/user-roles
+Content-Type: application/json
+
+{
+  "clientId": "website-clientid",
+  "subjectId": "user3",
+  "role": "Admin"
+}
+
+
+### Associate a user with a role in a client
+POST http://localhost:56520/user-roles
+Content-Type: application/json
+
+{
+  "clientId": "bffapi-clientid",
+  "subjectId": "user3",
+  "role": "reader"
+}
+
+
+### Login form (browser only)
+GET http://localhost:56520/login
+
+### Simulate login (can only be tested via browser or form post)
+POST http://localhost:5000/login?returnUrl=/authorize
+Content-Type: application/x-www-form-urlencoded
+
+username=user3
+
+### Get OIDC Discovery Document
+GET http://localhost:56520/.well-known/openid-configuration
+
+### Get OIDC JWKs
+GET http://localhost:56520/.well-known/jwks.json
+
+### Start Authorization Code Flow
+GET http://localhost:56520/authorize?response_type=code&client_id=my-client-id&redirect_uri=http://localhost:5002/callback&scope=openid%20profile&state=test123
+
+### Exchange Code for Token (replace CODE below with the actual one from /authorize redirect)
+POST http://localhost:56520/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&
+code=CODE&
+client_id=my-client-id&
+redirect_uri=http://localhost:5002/callback
+
+ 
+### OBO token request (BFF acting on behalf of the user)
+POST http://localhost:56520/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer
+client_id=mybffapi-clientid
+client_secret=super-secret-if-needed
+requested_token_use=on_behalf_of
+assertion=eyJhbGciOi...user-access-token-here...
+audience=mybackendapi-clientid
