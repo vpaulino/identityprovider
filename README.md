@@ -298,3 +298,53 @@ The website can now:
 - Enable BFF to use the token or further exchange it for downstream access via OBO
 
 This design brings the system closer to real-world identity providers like Azure Entra ID or Auth0.
+
+
+
+## 🐳 Running the Identity Provider with Docker
+
+This project includes a `Dockerfile` to containerize the Identity Provider API using the official .NET 8 SDK and ASP.NET runtime images.
+
+### 📁 Project Structure
+
+The `Dockerfile` for the Identity Provider is located at:
+
+```
+src/IdentityProviderApi/Dockerfile
+```
+
+To ensure all paths resolve correctly during build, you must run `docker build` from the **solution root directory**, where the `.sln` file lives.
+
+---
+
+### 🏗️ Build the Docker Image
+
+Open a terminal in the root of the repository (where the `.sln` file is located) and run:
+
+```bash
+docker build -t identity-provider-api -f src/IdentityProviderApi/Dockerfile .
+```
+
+- `-t identity-provider-api`: Tags the image for easier reference
+- `-f src/IdentityProviderApi/Dockerfile`: Path to the Dockerfile
+- `.`: Build context — must be the solution root to resolve all relative paths
+
+---
+
+### 🚀 Run the Container
+
+Once the image is built, you can run the Identity Provider container like this:
+
+```bash
+docker run -p 56520:56520 --name idp identity-provider-api
+```
+
+Then navigate to:
+
+```
+http://localhost:56520/.well-known/openid-configuration
+```
+
+...to verify the discovery document is available.
+
+---
