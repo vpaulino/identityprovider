@@ -1,4 +1,4 @@
-﻿using IdentityProviderApi.Repositories;
+using IdentityProviderApi.Repositories;
 using IdentityProviderApi.Scopes;
 using IdentityProviderApi.TokenGrantHandlers;
 using Microsoft.AspNetCore.Authentication;
@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,8 @@ using System.Security.Claims;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 builder.Services.AddSingleton<JwtTokenGenerator>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -51,6 +54,8 @@ builder.Services.AddSingleton<TokenEndpointHandler>();
 
 builder.Services.AddControllers();
 var app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.MapPost("/users", ([FromBody] User user, [FromServices] IUserStore userStore) =>
 {

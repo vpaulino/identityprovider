@@ -13,4 +13,7 @@
   <ItemGroup>
     <Folder Include="NewFolder\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IdP.ServiceDefaults\IdP.ServiceDefaults.csproj" />
+  </ItemGroup>
 </Project>
